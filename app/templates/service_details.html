@@ -1,0 +1,92 @@
+{% extends "base.html" %}
+
+{% block title %}{{ service.name }} - Kidiversão{% endblock %}
+
+{% block content %}
+<div class="container py-4">
+    <nav aria-label="breadcrumb" class="mb-4">
+        <ol class="breadcrumb">
+            <li class="breadcrumb-item"><a href="{{ url_for('main.index') }}">Início</a></li>
+            <li class="breadcrumb-item active" aria-current="page">{{ service.name }}</li>
+        </ol>
+    </nav>
+
+    <div class="row">
+        <!-- Coluna da imagem -->
+        <div class="col-md-6 mb-4">
+            <div class="card shadow-sm border-0 h-100">
+                {% if service.image_url %}
+                    <img src="{{ service.image_url }}" class="card-img-top img-fluid rounded" alt="{{ service.name }}" style="object-fit: cover; max-height: 400px;">
+                {% else %}
+                    <div class="bg-light d-flex align-items-center justify-content-center" style="height: 400px;">
+                        <p class="text-muted">Imagem não disponível</p>
+                    </div>
+                {% endif %}
+            </div>
+        </div>
+        
+        <!-- Coluna de detalhes -->
+        <div class="col-md-6">
+            <div class="card shadow-sm border-0 h-100">
+                <div class="card-body">
+                    <h1 class="card-title display-6 mb-3">{{ service.name }}</h1>
+                    
+                    <div class="mb-4">
+                        <h6 class="text-success fs-4">R$ {{ service.price|format_price_br }}</h6>
+                    </div>
+                    
+                    <div class="mb-4">
+                        <h5 class="border-bottom pb-2 mb-3">Descrição</h5>
+                        <p class="lead">{{ service.description }}</p>
+                    </div>
+                    
+                    {% if current_user.is_authenticated %}
+                    <div class="d-grid gap-2 mb-3">
+                        <form method="post" action="{{ url_for('main.add_to_cart', service_id=service.id) }}">
+                            <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+                            <div class="d-flex mb-3">
+                                <div class="input-group me-2" style="max-width: 150px;">
+                                    <span class="input-group-text">Qtd</span>
+                                    <input type="number" class="form-control" name="quantity" value="1" min="1" max="10">
+                                </div>
+                                <button type="submit" class="btn btn-primary flex-grow-1">
+                                    <i class="bi bi-cart-plus"></i> Adicionar ao Carrinho
+                                </button>
+                            </div>
+                        </form>
+                        <a href="{{ url_for('main.book_service', service_id=service.id) }}" class="btn btn-outline-primary">
+                            <i class="bi bi-calendar-check"></i> Reservar Diretamente
+                        </a>
+                    </div>
+                    
+                    <div class="d-flex gap-2 mt-3">
+                        <a href="{{ url_for('main.edit_service', service_id=service.id) }}" class="btn btn-info flex-grow-1">
+                            <i class="bi bi-pencil"></i> Editar
+                        </a>
+                        <form method="post" action="{{ url_for('main.delete_service', service_id=service.id) }}" class="flex-grow-1" onsubmit="return confirm('Tem certeza que deseja excluir este serviço?');">
+                            <input type="hidden" name="csrf_token" value="{{ csrf_token() }}"/>
+                            <button type="submit" class="btn btn-danger w-100">
+                                <i class="bi bi-trash"></i> Excluir
+                            </button>
+                        </form>
+                    </div>
+                    {% else %}
+                    <div class="alert alert-info">
+                        <h5><i class="bi bi-info-circle"></i> Quer reservar este serviço?</h5>
+                        <p>Para fazer uma reserva, é necessário criar uma conta ou fazer login.</p>
+                        <div class="d-flex gap-2 mt-3">
+                            <a href="{{ url_for('main.login') }}" class="btn btn-primary flex-grow-1">
+                                <i class="bi bi-box-arrow-in-right"></i> Fazer Login
+                            </a>
+                            <a href="{{ url_for('main.register') }}" class="btn btn-outline-primary flex-grow-1">
+                                <i class="bi bi-person-plus"></i> Criar Conta
+                            </a>
+                        </div>
+                    </div>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

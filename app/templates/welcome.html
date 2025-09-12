@@ -1,0 +1,71 @@
+{% extends "base.html" %}
+
+{% block title %}Bem-vindo - Kidiversão{% endblock %}
+
+{% block content %}
+<div class="container py-5">
+    <div class="row justify-content-center">
+        <div class="col-lg-8">
+            <div class="card shadow-lg border-0">
+                <div class="card-body text-center p-5">
+                    <div class="mb-4">
+                        <i class="bi bi-lock-fill display-1 text-primary mb-3"></i>
+                        <h1 class="display-4 fw-bold text-primary mb-3">Acesso Restrito</h1>
+                        <p class="lead text-muted mb-4">
+                            Esta área é exclusiva para usuários registrados. 
+                            Para acessar nossos serviços e fazer reservas, você precisa estar logado.
+                        </p>
+                    </div>
+
+                    <div class="row mb-4">
+                        <div class="col-md-6 mb-3">
+                            <div class="card bg-light border-0 h-100">
+                                <div class="card-body">
+                                    <i class="bi bi-person-plus-fill text-primary fs-1 mb-3"></i>
+                                    <h5>Novo por aqui?</h5>
+                                    <p class="text-muted small">Crie sua conta gratuitamente e acesse todos os nossos serviços.</p>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-6 mb-3">
+                            <div class="card bg-light border-0 h-100">
+                                <div class="card-body">
+                                    <i class="bi bi-box-arrow-in-right text-success fs-1 mb-3"></i>
+                                    <h5>Já tem conta?</h5>
+                                    <p class="text-muted small">Faça login e aproveite nossos serviços de festa infantil.</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="d-grid gap-3 col-md-8 mx-auto">
+                        <a href="{{ url_for('main.register') }}" class="btn btn-primary btn-lg">
+                            <i class="bi bi-person-plus me-2"></i>Criar Conta Gratuita
+                        </a>
+                        <a href="{{ url_for('main.login') }}" class="btn btn-outline-primary btn-lg">
+                            <i class="bi bi-box-arrow-in-right me-2"></i>Fazer Login
+                        </a>
+                    </div>
+
+                    <hr class="my-4">
+                    
+                    <div class="text-muted">
+                        <h6 class="fw-bold">🎉 O que você encontrará:</h6>
+                        <div class="row mt-3">
+                            <div class="col-md-4 mb-2">
+                                <small><i class="bi bi-check-circle-fill text-success me-1"></i> Serviços de festa</small>
+                            </div>
+                            <div class="col-md-4 mb-2">
+                                <small><i class="bi bi-check-circle-fill text-success me-1"></i> Reservas online</small>
+                            </div>
+                            <div class="col-md-4 mb-2">
+                                <small><i class="bi bi-check-circle-fill text-success me-1"></i> Carrinho de compras</small>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

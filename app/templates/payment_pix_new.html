@@ -1,0 +1,65 @@
+{% extends "base.html" %}
+
+{% block title %}Pagamento PIX - Kidiversão{% endblock %}
+
+{% block content %}
+<div class="container my-5">
+    <div class="row">
+        <div class="col-md-6 offset-md-3">
+            <div class="card shadow">
+                <div class="card-header bg-primary text-white">
+                    <h1 class="h3 mb-0">Pagamento via PIX</h1>
+                </div>
+                <div class="card-body text-center">
+                    <div class="mb-4">
+                        <h2 class="h4">Detalhes do Pedido</h2>
+                        <div class="d-flex justify-content-between">
+                            <p><strong>Pedido:</strong> #{{ booking.id }}</p>
+                            <p><strong>Valor:</strong> R$ {{ booking.total_amount|format_price_br }}</p>
+                        </div>
+                        <p><strong>Data do Evento:</strong> {{ booking.event_date.strftime('%d/%m/%Y') }}</p>
+                    </div>
+
+                    <div class="mb-4">
+                        <h2 class="h4">QR Code PIX</h2>
+                        <p class="mb-3">Simulação de pagamento via PIX</p>
+                        
+                        <div class="alert alert-info mb-4">
+                            <p class="mb-0">Este é um ambiente de demonstração. Em um sistema real, aqui seria exibido um QR Code para pagamento via PIX.</p>
+                        </div>
+                        
+                        <!-- QR Code Image -->
+                        <div class="mb-3">
+                            <div class="bg-light p-4 rounded-3 d-inline-block mb-3">
+                                <i class="bi bi-qr-code display-4"></i>
+                            </div>
+                        </div>
+                        
+                        <!-- PIX Copy & Paste -->
+                        <div class="mb-3">
+                            <p class="small text-muted mb-1">Chave PIX: kidiversao@email.com</p>
+                        </div>
+                        
+                        <!-- Simulation Buttons -->
+                        <div class="mb-3">
+                            <p>Para simular um pagamento, escolha uma das opções abaixo:</p>
+                            <div class="d-grid gap-2">
+                                <a href="{{ url_for('main.payment_success', booking_id=booking.id) }}" class="btn btn-success">
+                                    <i class="bi bi-check-circle"></i> Simular Pagamento Bem-Sucedido
+                                </a>
+                                <a href="{{ url_for('main.payment_cancel', booking_id=booking.id) }}" class="btn btn-outline-danger">
+                                    <i class="bi bi-x-circle"></i> Cancelar Pagamento
+                                </a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="card-footer bg-light d-flex justify-content-between">
+                    <a href="{{ url_for('main.checkout') }}" class="btn btn-secondary">Voltar</a>
+                    <a href="{{ url_for('main.index') }}" class="btn btn-primary">Página Inicial</a>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

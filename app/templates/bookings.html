@@ -1,0 +1,106 @@
+s{% extends "base.html" %}
+
+{% block title %}Agendamentos - Kidiversão{% endblock %}
+
+{% block content %}
+<div class="container my-5">
+    <div class="row">
+        <div class="col-md-10 offset-md-1">
+            <div class="card shadow">
+                <div class="card-header bg-primary text-white d-flex justify-content-between align-items-center">
+                    <h1 class="h3 mb-0">📅 Meus Agendamentos</h1>
+                    <a href="{{ url_for('main.create_booking') }}" class="btn btn-light">
+                        <i class="bi bi-plus-circle"></i> Novo Agendamento
+                    </a>
+                </div>
+                <div class="card-body">
+                    {% if bookings %}
+                        <div class="table-responsive">
+                            <table class="table table-hover">
+                                <thead class="table-light">
+                                    <tr>
+                                        <th>ID</th>
+                                        <th>Serviço/Pacote</th>
+                                        <th>Data do Evento</th>
+                                        <th>Status</th>
+                                        <th>Pagamento</th>
+                                        <th>Ações</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    {% for booking in bookings %}
+                                    <tr>
+                                        <td>{{ booking.id }}</td>
+                                        <td>
+                                            {% if booking.package %}
+                                                <span class="badge bg-info">Pacote</span>
+                                                {{ booking.package.name }}
+                                            {% elif booking.service %}
+                                                <span class="badge bg-secondary">Serviço</span>
+                                                {{ booking.service.name }}
+                                            {% else %}
+                                                Não disponível
+                                            {% endif %}
+                                        </td>
+                                        <td>{{ booking.event_date.strftime('%d/%m/%Y') }}</td>
+                                        <td>
+                                            <span class="badge rounded-pill 
+                                                {% if booking.status == 'Confirmado' %}bg-success
+                                                {% elif booking.status == 'Pendente' %}bg-warning
+                                                {% elif booking.status == 'Aguardando Pagamento' %}bg-info
+                                                {% else %}bg-secondary{% endif %}">
+                                                {{ booking.status }}
+                                            </span>
+                                        </td>
+                                        <td>
+                                            <span class="badge rounded-pill 
+                                                {% if booking.payment_status == 'Aprovado' %}bg-success
+                                                {% elif booking.payment_status == 'Pendente' %}bg-warning
+                                                {% elif booking.payment_status == 'Cancelado' %}bg-danger
+                                                {% else %}bg-secondary{% endif %}">
+                                                {% if booking.payment_status %}
+                                                    {{ booking.payment_status }}
+                                                {% else %}
+                                                    Aguardando
+                                                {% endif %}
+                                            </span>
+                                        </td>
+                                        <td>
+                                            {% if booking.payment_status != 'approved' %}
+                                                <a href="{{ url_for('main.payment', booking_id=booking.id) }}" class="btn btn-sm btn-primary">
+                                                    <i class="bi bi-credit-card"></i> Pagar
+                                                </a>
+                                                
+                                                <form action="{{ url_for('main.cancel_booking', booking_id=booking.id) }}" method="POST" class="d-inline">
+                                                    <input type="hidden" name="csrf_token" value="{{ csrf_token() }}"/>
+                                                    <button type="submit" class="btn btn-sm btn-danger" onclick="return confirm('Tem certeza que deseja cancelar este agendamento? Esta ação não pode ser desfeita.')">
+                                                        <i class="bi bi-x-circle"></i> Cancelar
+                                                    </button>
+                                                </form>
+                                            {% else %}
+                                                <button class="btn btn-sm btn-success" disabled>
+                                                    <i class="bi bi-check-circle"></i> Pago
+                                                </button>
+                                            {% endif %}
+                                        </td>
+                                    </tr>
+                                    {% endfor %}
+                                </tbody>
+                            </table>
+                        </div>
+                    {% else %}
+                        <div class="alert alert-info">
+                            <p class="mb-0">Você ainda não possui agendamentos. <a href="{{ url_for('main.index') }}">Confira nossos serviços</a> e faça sua reserva!</p>
+                        </div>
+                    {% endif %}
+                </div>
+                <div class="card-footer bg-light">
+                    <a href="{{ url_for('main.index') }}" class="btn btn-secondary">
+                        <i class="bi bi-arrow-left"></i> Voltar para Serviços
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

@@ -1,0 +1,141 @@
+{% extends "base.html" %}
+
+{% block title %}Checkout - Kidiversão{% endblock %}
+
+{% block content %}
+<div class="container py-4">
+    <h1 class="display-5 fw-bold mb-4"><i class="bi bi-credit-card"></i> Checkout</h1>
+    
+    {% if cart_items %}
+    <div class="row">
+        <div class="col-lg-8">
+            <div class="card shadow-sm mb-4">
+                <div class="card-header bg-light">
+                    <h5 class="mb-0">Finalizar Pedido</h5>
+                </div>
+                <div class="card-body">
+                    <form method="post" action="{{ url_for('main.checkout') }}">
+                        <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+                        
+                        <h6 class="mb-3 border-bottom pb-2">Data do Evento</h6>
+                        <div class="row mb-4">
+                            <div class="col-md-6">
+                                <div class="mb-3">
+                                    <label for="event_date" class="form-label">Data do Evento</label>
+                                    <input type="date" class="form-control" id="event_date" name="event_date" required
+                                           min="{{ now.strftime('%Y-%m-%d') }}">
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <h6 class="mb-3 border-bottom pb-2">Informações de Contato</h6>
+                        <div class="row mb-4">
+                            <div class="col-md-6">
+                                <div class="mb-3">
+                                    <label for="name" class="form-label">Nome Completo</label>
+                                    <input type="text" class="form-control" id="name" name="name" 
+                                           value="{{ current_user.username }}" required>
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="mb-3">
+                                    <label for="email" class="form-label">Email</label>
+                                    <input type="email" class="form-control" id="email" name="email" 
+                                           value="{{ current_user.email }}" required>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <h6 class="mb-3 border-bottom pb-2">Método de Pagamento</h6>
+                        <div class="mb-4">
+                            <div class="form-check mb-2">
+                                <input class="form-check-input" type="radio" name="payment_method" id="payment_pix" value="pix" checked>
+                                <label class="form-check-label" for="payment_pix">
+                                    <i class="bi bi-qr-code"></i> PIX
+                                </label>
+                            </div>
+                            <div class="form-check mb-2">
+                                <input class="form-check-input" type="radio" name="payment_method" id="payment_credit" value="credit" disabled>
+                                <label class="form-check-label" for="payment_credit">
+                                    <i class="bi bi-credit-card"></i> Cartão de Crédito (em breve)
+                                </label>
+                            </div>
+                            <div class="form-check">
+                                <input class="form-check-input" type="radio" name="payment_method" id="payment_boleto" value="boleto" disabled>
+                                <label class="form-check-label" for="payment_boleto">
+                                    <i class="bi bi-file-earmark-bar-graph"></i> Boleto Bancário (em breve)
+                                </label>
+                            </div>
+                        </div>
+                        
+                        <div class="d-grid">
+                            <button type="submit" class="btn btn-primary btn-lg">
+                                <i class="bi bi-check-circle"></i> Confirmar Pedido
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+        
+        <div class="col-lg-4">
+            <div class="card shadow-sm mb-4">
+                <div class="card-header bg-light">
+                    <h5 class="mb-0">Resumo do Pedido</h5>
+                </div>
+                <div class="card-body">
+                    <div class="mb-3">
+                        <h6>Itens ({{ item_count }})</h6>
+                        <ul class="list-group list-group-flush">
+                            {% for item in cart_items %}
+                            <li class="list-group-item px-0 d-flex justify-content-between">
+                                <div>
+                                    <span>{{ item.service.name }}</span>
+                                    <small class="d-block text-muted">Quantidade: {{ item.quantity }}</small>
+                                </div>
+                                <span>R$ {{ (item.service.price|float * item.quantity)|format_price_br }}</span>
+                            </li>
+                            {% endfor %}
+                        </ul>
+                    </div>
+                    
+                    <div class="border-top pt-3">
+                        <div class="d-flex justify-content-between mb-2">
+                            <span>Subtotal:</span>
+                            <span>R$ {{ total|format_price_br }}</span>
+                        </div>
+                        <div class="d-flex justify-content-between mb-2">
+                            <span>Taxa de serviço:</span>
+                            <span>R$ 0,00</span>
+                        </div>
+                        <div class="d-flex justify-content-between mb-2 fw-bold">
+                            <span>Total:</span>
+                            <span>R$ {{ total|format_price_br }}</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="card shadow-sm">
+                <div class="card-body">
+                    <a href="{{ url_for('main.cart') }}" class="btn btn-outline-secondary w-100">
+                        <i class="bi bi-arrow-left"></i> Voltar ao Carrinho
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+    {% else %}
+    <div class="card shadow-sm text-center p-5">
+        <div class="py-5">
+            <i class="bi bi-cart-x display-1 text-muted mb-4"></i>
+            <h2>Seu carrinho está vazio</h2>
+            <p class="lead">Você precisa adicionar serviços ao carrinho antes de finalizar a compra.</p>
+            <a href="{{ url_for('main.index') }}" class="btn btn-primary mt-3">
+                <i class="bi bi-shop"></i> Explorar Serviços
+            </a>
+        </div>
+    </div>
+    {% endif %}
+</div>
+{% endblock %}

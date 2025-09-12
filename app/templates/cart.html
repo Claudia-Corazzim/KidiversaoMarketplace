@@ -1,0 +1,98 @@
+{% extends "base.html" %}
+
+{% block title %}Carrinho - Kidiversão{% endblock %}
+
+{% block content %}
+<div class="container py-4">
+    <h1 class="display-5 fw-bold mb-4"><i class="bi bi-cart"></i> Meu Carrinho</h1>
+    
+    {% if cart_items %}
+        <div class="card shadow-sm mb-4">
+            <div class="card-body p-0">
+                <div class="table-responsive">
+                    <table class="table table-hover mb-0">
+                        <thead class="table-light">
+                            <tr>
+                                <th>Serviço</th>
+                                <th>Preço</th>
+                                <th>Quantidade</th>
+                                <th>Subtotal</th>
+                                <th>Ações</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for item in cart_items %}
+                            <tr>
+                                <td>
+                                    <div class="d-flex align-items-center">
+                                        {% if item.service.image_url %}
+                                            <img src="{{ item.service.image_url }}" alt="{{ item.service.name }}" class="me-3" style="width: 60px; height: 60px; object-fit: cover; border-radius: 5px;">
+                                        {% else %}
+                                            <div class="bg-light me-3 d-flex align-items-center justify-content-center" style="width: 60px; height: 60px; border-radius: 5px;">
+                                                <i class="bi bi-image text-muted"></i>
+                                            </div>
+                                        {% endif %}
+                                        <div>
+                                            <h6 class="mb-0">{{ item.service.name }}</h6>
+                                            <a href="{{ url_for('main.service_details', service_id=item.service.id) }}" class="text-muted small">Ver detalhes</a>
+                                        </div>
+                                    </div>
+                                </td>
+                                <td>R$ {{ item.service.price|format_price_br }}</td>
+                                <td>
+                                    <div class="quantity-controls d-flex align-items-center">
+                                        <form method="post" action="{{ url_for('main.update_cart_item', item_id=item.id) }}" class="d-flex align-items-center">
+                                            <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+                                            <button type="submit" name="action" value="decrease" class="btn btn-sm btn-outline-secondary" {% if item.quantity <= 1 %}disabled{% endif %}>
+                                                <i class="bi bi-dash"></i>
+                                            </button>
+                                            <span class="mx-2">{{ item.quantity }}</span>
+                                            <button type="submit" name="action" value="increase" class="btn btn-sm btn-outline-secondary">
+                                                <i class="bi bi-plus"></i>
+                                            </button>
+                                        </form>
+                                    </div>
+                                </td>
+                                <td>R$ {{ (item.service.price|float * item.quantity)|format_price_br }}</td>
+                                <td>
+                                    <form method="post" action="{{ url_for('main.remove_from_cart', item_id=item.id) }}" onsubmit="return confirm('Tem certeza que deseja remover este item do carrinho?');">
+                                        <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+                                        <button type="submit" class="btn btn-sm btn-danger">
+                                            <i class="bi bi-trash"></i>
+                                        </button>
+                                    </form>
+                                </td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+            <div class="card-footer bg-white">
+                <div class="d-flex justify-content-between align-items-center">
+                    <h5 class="mb-0">Total: <span class="text-primary">R$ {{ total|format_price_br }}</span></h5>
+                    <div>
+                        <a href="{{ url_for('main.index') }}" class="btn btn-outline-secondary me-2">
+                            <i class="bi bi-arrow-left"></i> Continuar Comprando
+                        </a>
+                        <a href="{{ url_for('main.checkout') }}" class="btn btn-primary">
+                            <i class="bi bi-credit-card"></i> Finalizar Compra
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    {% else %}
+        <div class="card shadow-sm text-center p-5">
+            <div class="py-5">
+                <i class="bi bi-cart-x display-1 text-muted mb-4"></i>
+                <h2>Seu carrinho está vazio</h2>
+                <p class="lead">Você ainda não adicionou nenhum serviço ao seu carrinho.</p>
+                <a href="{{ url_for('main.index') }}" class="btn btn-primary mt-3">
+                    <i class="bi bi-shop"></i> Explorar Serviços
+                </a>
+            </div>
+        </div>
+    {% endif %}
+</div>
+{% endblock %}
