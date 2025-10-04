@@ -7,7 +7,7 @@
   <div class="row mb-4">
     <div class="col">
       <h1 class="display-5 fw-bold"><i class="bi bi-calendar-plus"></i> Criar Agendamento</h1>
-      <p class="lead">Agende aqui uma nova festa para sua criança</p>
+      <p class="lead">Agende aqui uma nova festa para sua diversão</p>
     </div>
     <div class="col-auto d-flex align-items-center">
       <a href="{{ url_for('main.list_bookings') }}" class="btn btn-outline-primary">
@@ -65,7 +65,7 @@
             </div>
             
             <div class="d-grid gap-2 d-md-flex justify-content-md-end">
-              <button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#confirmServiceModal">
+              <button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#confirmServiceModal" id="confirmButton" disabled>
                 <i class="bi bi-calendar-check"></i> Confirmar Agendamento
               </button>
             </div>
@@ -81,7 +81,7 @@
         </div>
         <div class="card-body">
           <p>Ao agendar uma festa, você está reservando a data para o pacote escolhido.</p>
-          <p>Você pode ver detalhes e gerenciar seus agendamentos na página de agendamentos.</p>
+          <p>Você pode ver detalhes e gerenciar seus agendamentos na página de <a href="{{ url_for('main.list_bookings') }}">Agendamentos</a>.</p>
           <p>O pagamento deverá ser realizado após a confirmação do agendamento.</p>
           <hr>
           <div class="d-flex align-items-center mb-2">
@@ -135,7 +135,7 @@
 <div class="modal fade" id="confirmPackageModal" tabindex="-1" aria-labelledby="confirmPackageModalLabel" aria-hidden="true">
   <div class="modal-dialog">
     <div class="modal-content">
-      <div class="modal-header bg-info text-white">
+      <div class="modal-header bg-primary text-white">
         <h5 class="modal-title" id="confirmPackageModalLabel">Confirmar Agendamento de Pacote</h5>
         <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Fechar"></button>
       </div>
@@ -179,7 +179,23 @@
     const packageSelect = document.getElementById('package_id');
     const bookingTypeService = document.getElementById('booking_type_service');
     const bookingTypePackage = document.getElementById('booking_type_package');
-    
+    const confirmButton = document.getElementById('confirmButton');
+
+    // Habilitar ou desabilitar botão de confirmação
+    function toggleConfirmButton() {
+      const isServiceSelected = serviceSelect.value !== '';
+      const isPackageSelected = packageSelect.value !== '';
+      const isDateSelected = dateInput.value !== '';
+
+      if (bookingTypeService.checked) {
+        confirmButton.disabled = !isServiceSelected || !isDateSelected;
+        confirmButton.setAttribute('data-bs-target', '#confirmServiceModal');
+      } else {
+        confirmButton.disabled = !isPackageSelected || !isDateSelected;
+        confirmButton.setAttribute('data-bs-target', '#confirmPackageModal');
+      }
+    }
+
     // Toggle entre serviço e pacote
     bookingTypeService.addEventListener('change', function() {
       if (this.checked) {
@@ -187,6 +203,8 @@
         packageSelection.classList.add('d-none');
         serviceSelect.setAttribute('required', '');
         packageSelect.removeAttribute('required');
+        packageSelect.value = ''; // Limpar seleção de pacote
+        toggleConfirmButton(); // Validar botão após mudança
       }
     });
     
@@ -196,6 +214,8 @@
         serviceSelection.classList.add('d-none');
         packageSelect.setAttribute('required', '');
         serviceSelect.removeAttribute('required');
+        serviceSelect.value = ''; // Limpar seleção de serviço
+        toggleConfirmButton(); // Validar botão após mudança
       }
     });
     
@@ -207,8 +227,8 @@
     const packageEventDateSpan = document.getElementById('packageEventDate');
     
     // Botão que abre o modal
-    const modalButton = document.querySelector('[data-bs-target="#confirmServiceModal"]');
-    
+    const modalButton = document.querySelector('#confirmButton');
+
     // Atualizar informações no modal antes de abrir
     modalButton.addEventListener('click', function(e) {
       // Verificar se formulário está válido
@@ -247,7 +267,12 @@
         packageEventDateSpan.textContent = formattedDate;
       }
     });
-    
+
+    // Adicionar listeners para mudança de valor nos selects e no input de data
+    serviceSelect.addEventListener('change', toggleConfirmButton);
+    packageSelect.addEventListener('change', toggleConfirmButton);
+    dateInput.addEventListener('change', toggleConfirmButton);
+
     // Submeter formulário quando confirmar no modal
     document.getElementById('submitServiceBooking').addEventListener('click', function() {
       document.getElementById('bookingForm').submit();
@@ -256,6 +281,9 @@
     document.getElementById('submitPackageBooking').addEventListener('click', function() {
       document.getElementById('bookingForm').submit();
     });
+
+    // Executar validação inicial
+    toggleConfirmButton();
   });
 </script>
 {% endblock %}

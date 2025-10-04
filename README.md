@@ -10,6 +10,7 @@ O Kidiversão é um sistema web para gerenciamento de serviços e pacotes para f
 
 - **Gerenciamento de Serviços**: Cadastro, edição, visualização e exclusão de serviços para festas.
 - **Gerenciamento de Pacotes**: Criação de pacotes personalizados combinando diferentes serviços.
+- **Carrinho de Compras**: Sistema completo de carrinho permitindo adicionar, remover e gerenciar itens antes da compra.
 - **Sistema de Reservas**: Clientes podem fazer reservas de serviços e pacotes.
 - **Pagamentos Online**: Estrutura preparada para integração com gateways de pagamento.
 - **Autenticação de Usuários**: Sistema de registro e login para clientes e prestadores.

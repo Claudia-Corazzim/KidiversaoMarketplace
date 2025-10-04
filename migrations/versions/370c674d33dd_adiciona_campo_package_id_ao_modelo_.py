@@ -21,7 +21,7 @@ def upgrade():
     with op.batch_alter_table('booking', schema=None) as batch_op:
         batch_op.add_column(sa.Column('package_id', sa.Integer(), nullable=True))
         batch_op.create_index(batch_op.f('ix_booking_package_id'), ['package_id'], unique=False)
-        batch_op.create_foreign_key(None, 'package', ['package_id'], ['id'])
+        batch_op.create_foreign_key('fk_booking_package_id', 'package', ['package_id'], ['id'])
 
     with op.batch_alter_table('user', schema=None) as batch_op:
         batch_op.drop_column('phone')
@@ -35,7 +35,7 @@ def downgrade():
         batch_op.add_column(sa.Column('phone', sa.VARCHAR(length=20), autoincrement=False, nullable=True))
 
     with op.batch_alter_table('booking', schema=None) as batch_op:
-        batch_op.drop_constraint(None, type_='foreignkey')
+        batch_op.drop_constraint('fk_booking_package_id', type_='foreignkey')
         batch_op.drop_index(batch_op.f('ix_booking_package_id'))
         batch_op.drop_column('package_id')
 

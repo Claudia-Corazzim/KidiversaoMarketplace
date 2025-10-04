@@ -47,7 +47,7 @@
                         
                         <div class="user-menu d-flex align-items-center">
                             {% if current_user.is_authenticated %}
-                                <a href="{{ url_for('main.cart') }}" class="btn btn-outline-primary position-relative me-3">
+                                <a href="{{ url_for('main.cart') }}" class="btn btn-primary position-relative me-3">
                                     <i class="bi bi-cart"></i>
                                     {% if current_user.get_cart_count() > 0 %}
                                     <span class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger">
@@ -55,14 +55,13 @@
                                     </span>
                                     {% endif %}
                                 </a>
-                                <span class="me-2">Olá, {{ current_user.username }}</span>
-                                <a href="{{ url_for('main.logout') }}" class="btn btn-outline-primary btn-sm">Sair</a>
-                                {% if current_user.is_admin %}
-                                    <a href="{{ url_for('main.admin_dashboard') }}" class="btn btn-outline-primary btn-sm">Admin</a>
+                            <span class="me-2">Olá, {{ current_user.username.split()[:2] | join(' ') }}</span>                                {% if current_user.is_admin %}
+                                    <a href="{{ url_for('main.admin_dashboard') }}" class="btn btn-outline-primary btn-sm mx-2">Admin</a>
                                 {% endif %}
+                            <a href="{{ url_for('main.logout') }}" class="btn btn-outline-primary btn-sm">Sair</a>
                             {% else %}
-                                <a href="{{ url_for('main.login') }}" class="btn btn-outline-primary btn-sm me-2">Login</a>
-                                <a href="{{ url_for('main.register') }}" class="btn btn-primary btn-sm">Registrar</a>
+                                <a href="{{ url_for('main.login') }}" class="btn btn-primary btn-sm me-2 mx-2">Login</a>
+                                <a href="{{ url_for('main.register') }}" class="btn btn-secondary btn-sm">Registrar</a>
                             {% endif %}
                         </div>
                     </div>
@@ -105,13 +104,13 @@
                     <div>
                         <a href="https://www.facebook.com/profile.php?id=61577869483972&locale=pt_BR" 
                            class="text-decoration-none" target="_blank">
-                            <i class="bi bi-facebook text-primary"></i> Facebook
+                            Facebook <i class="bi bi-facebook text-primary"></i>
                         </a>
                     </div>
                     <div>
                         <a href="https://www.instagram.com/ach_adinhosclau?igsh=MnEwcTF1a215cXNq" 
                            class="text-decoration-none" target="_blank">
-                            <i class="bi bi-instagram text-danger"></i> Instagram
+                            Instagram <i class="bi bi-instagram text-danger"></i>
                         </a>
                     </div>
                 </div>

@@ -1,4 +1,4 @@
-s{% extends "base.html" %}
+{% extends "base.html" %}
 
 {% block title %}Agendamentos - Kidiversão{% endblock %}
 
@@ -29,7 +29,7 @@ s{% extends "base.html" %}
                                 </thead>
                                 <tbody>
                                     {% for booking in bookings %}
-                                    <tr>
+                                    <tr onclick="window.location='{{ url_for('main.booking_details', booking_id=booking.id) }}';" style="cursor: pointer;">
                                         <td>{{ booking.id }}</td>
                                         <td>
                                             {% if booking.package %}
@@ -66,7 +66,7 @@ s{% extends "base.html" %}
                                             </span>
                                         </td>
                                         <td>
-                                            {% if booking.payment_status != 'approved' %}
+                                            {% if booking.payment_status != 'Aprovado' %}
                                                 <a href="{{ url_for('main.payment', booking_id=booking.id) }}" class="btn btn-sm btn-primary">
                                                     <i class="bi bi-credit-card"></i> Pagar
                                                 </a>

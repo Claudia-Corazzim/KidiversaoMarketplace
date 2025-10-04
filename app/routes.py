@@ -213,7 +213,7 @@ def create_booking():
                 service_id=service_id,
                 package_id=None,  # Explicitamente definido como None para agendamentos de serviço
                 event_date=event_date_obj,
-                status='Pending',
+                status='Pendente',
                 total_amount=round(price, 2)
             )
         else:  # package
@@ -256,7 +256,7 @@ def create_booking():
                 service_id=service_id,
                 package_id=package_id,  # Guardamos a referência ao pacote
                 event_date=event_date_obj,
-                status='Pending',
+                status='Pendente',
                 total_amount=round(total_price, 2)
             )
         db.session.add(new_booking)
@@ -726,6 +726,13 @@ def checkout():
         event_date = request.form.get('event_date')
         payment_method = request.form.get('payment_method', 'pix')
         
+        # Converter string de data para objeto date do Python
+        try:
+            event_date_obj = datetime.strptime(event_date, '%Y-%m-%d').date()
+        except ValueError:
+            flash('Data inválida!', 'error')
+            return redirect(url_for('main.checkout'))
+
         # Criar um pacote temporário para o pedido
         temp_package = Package(
             user_id=current_user.id,
@@ -750,7 +757,7 @@ def checkout():
             user_id=current_user.id,
             service_id=cart_items[0].service_id,  # Usa o primeiro serviço como referência
             package_id=temp_package.id,
-            event_date=event_date,
+            event_date=event_date_obj,  # Usar o objeto date convertido
             status='Pendente',
             payment_status='Aguardando Pagamento',
             payment_method=payment_method,

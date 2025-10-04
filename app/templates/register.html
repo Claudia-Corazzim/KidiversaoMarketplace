@@ -13,13 +13,13 @@
           <form method="post">
             <input type="hidden" name="csrf_token" value="{{ csrf_token() }}"/>
             <div class="mb-3">
-              <label for="username" class="form-label">Nome de usuário</label>
-              <input type="text" class="form-control" id="username" name="username" placeholder="Escolha um nome de usuário" required>
+              <label for="username" class="form-label">Nome</label>
+              <input type="text" class="form-control" id="username" name="username" placeholder="Como gostaria de ser chamado?" required>
             </div>
             
             <div class="mb-3">
-              <label for="email" class="form-label">Email</label>
-              <input type="email" class="form-control" id="email" name="email" placeholder="Seu endereço de email" required>
+              <label for="email" class="form-label">E-mail</label>
+              <input type="email" class="form-control" id="email" name="email" placeholder="exemplo@email.com.br" required>
             </div>
             
             <div class="mb-3">
