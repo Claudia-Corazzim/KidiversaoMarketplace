@@ -89,7 +89,8 @@ kidiversao/
 
 6. Execute a aplicação:
    ```
-   python run.py
+   python run.py ou 
+   cd C:\Users\claud\OneDrive\Desktop\KidiversaoSqlite\KidiversaoMarketplace; python run.py
    ```
 
 7. Acesse no navegador:

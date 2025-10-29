@@ -1,0 +1,394 @@
+{% extends "base.html" %}
+
+{% block title %}Painel do Administrador - Kidiversão{% endblock %}
+
+{% block content %}
+<div class="container-fluid my-4">
+    <div class="row mb-4">
+        <div class="col-12">
+            <h1 class="h2">
+                <i class="bi bi-speedometer2"></i> Painel do Administrador
+            </h1>
+            <p class="text-muted">Visão geral e gerenciamento do sistema</p>
+        </div>
+    </div>
+
+    <!-- Estatísticas em Cards -->
+    <div class="row mb-4">
+        <div class="col-md-3 mb-3">
+            <div class="card bg-primary text-white shadow">
+                <div class="card-body">
+                    <div class="d-flex justify-content-between align-items-center">
+                        <div>
+                            <h6 class="text-uppercase mb-1">Total de Reservas</h6>
+                            <h2 class="mb-0">{{ bookings|length }}</h2>
+                        </div>
+                        <div>
+                            <i class="bi bi-calendar-check fs-1"></i>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-md-3 mb-3">
+            <div class="card bg-success text-white shadow">
+                <div class="card-body">
+                    <div class="d-flex justify-content-between align-items-center">
+                        <div>
+                            <h6 class="text-uppercase mb-1">Serviços Ativos</h6>
+                            <h2 class="mb-0">{{ services|length }}</h2>
+                        </div>
+                        <div>
+                            <i class="bi bi-briefcase fs-1"></i>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-md-3 mb-3">
+            <div class="card bg-info text-white shadow">
+                <div class="card-body">
+                    <div class="d-flex justify-content-between align-items-center">
+                        <div>
+                            <h6 class="text-uppercase mb-1">Usuários</h6>
+                            <h2 class="mb-0">{{ users|length }}</h2>
+                        </div>
+                        <div>
+                            <i class="bi bi-people fs-1"></i>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-md-3 mb-3">
+            <div class="card bg-warning text-dark shadow">
+                <div class="card-body">
+                    <div class="d-flex justify-content-between align-items-center">
+                        <div>
+                            <h6 class="text-uppercase mb-1">Pacotes</h6>
+                            <h2 class="mb-0">{{ packages|length }}</h2>
+                        </div>
+                        <div>
+                            <i class="bi bi-box-seam fs-1"></i>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Tabs de Navegação -->
+    <ul class="nav nav-tabs mb-4" id="adminTabs" role="tablist">
+        <li class="nav-item" role="presentation">
+            <button class="nav-link active" id="bookings-tab" data-bs-toggle="tab" data-bs-target="#bookings" 
+                    type="button" role="tab" aria-controls="bookings" aria-selected="true">
+                <i class="bi bi-calendar-event"></i> Reservas
+            </button>
+        </li>
+        <li class="nav-item" role="presentation">
+            <button class="nav-link" id="services-tab" data-bs-toggle="tab" data-bs-target="#services-content" 
+                    type="button" role="tab" aria-controls="services-content" aria-selected="false">
+                <i class="bi bi-briefcase"></i> Serviços
+            </button>
+        </li>
+        <li class="nav-item" role="presentation">
+            <button class="nav-link" id="users-tab" data-bs-toggle="tab" data-bs-target="#users-content" 
+                    type="button" role="tab" aria-controls="users-content" aria-selected="false">
+                <i class="bi bi-people"></i> Usuários
+            </button>
+        </li>
+        <li class="nav-item" role="presentation">
+            <button class="nav-link" id="packages-tab" data-bs-toggle="tab" data-bs-target="#packages-content" 
+                    type="button" role="tab" aria-controls="packages-content" aria-selected="false">
+                <i class="bi bi-box-seam"></i> Pacotes
+            </button>
+        </li>
+    </ul>
+
+    <!-- Conteúdo das Tabs -->
+    <div class="tab-content" id="adminTabsContent">
+        
+        <!-- Tab de Reservas -->
+        <div class="tab-pane fade show active" id="bookings" role="tabpanel" aria-labelledby="bookings-tab">
+            <div class="card shadow">
+                <div class="card-header bg-primary text-white d-flex justify-content-between align-items-center">
+                    <h5 class="mb-0"><i class="bi bi-calendar-check"></i> Gerenciar Reservas</h5>
+                    <span class="badge bg-light text-dark">{{ bookings|length }} reservas</span>
+                </div>
+                <div class="card-body">
+                    {% if bookings %}
+                    <div class="table-responsive">
+                        <table class="table table-hover">
+                            <thead class="table-light">
+                                <tr>
+                                    <th>ID</th>
+                                    <th>Cliente</th>
+                                    <th>Serviço/Pacote</th>
+                                    <th>Data do Evento</th>
+                                    <th>Status</th>
+                                    <th>Criado em</th>
+                                    <th>Ações</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for booking in bookings %}
+                                <tr>
+                                    <td><strong>#{{ booking.id }}</strong></td>
+                                    <td>
+                                        <i class="bi bi-person-circle"></i> {{ booking.user.username }}
+                                        <br><small class="text-muted">{{ booking.user.email }}</small>
+                                    </td>
+                                    <td>
+                                        {% if booking.service %}
+                                            <i class="bi bi-briefcase text-primary"></i> {{ booking.service.name }}
+                                        {% elif booking.package %}
+                                            <i class="bi bi-box-seam text-success"></i> {{ booking.package.name }}
+                                        {% else %}
+                                            <span class="text-muted">N/A</span>
+                                        {% endif %}
+                                    </td>
+                                    <td>{{ booking.event_date.strftime('%d/%m/%Y') }}</td>
+                                    <td>
+                                        {% if booking.status == 'Confirmado' %}
+                                            <span class="badge bg-success">{{ booking.status }}</span>
+                                        {% elif booking.status == 'Pendente' %}
+                                            <span class="badge bg-warning text-dark">{{ booking.status }}</span>
+                                        {% elif booking.status == 'Cancelado' %}
+                                            <span class="badge bg-danger">{{ booking.status }}</span>
+                                        {% elif booking.status == 'Aguardando Pagamento' %}
+                                            <span class="badge bg-info">{{ booking.status }}</span>
+                                        {% else %}
+                                            <span class="badge bg-secondary">{{ booking.status }}</span>
+                                        {% endif %}
+                                    </td>
+                                    <td><small>{{ booking.created_at.strftime('%d/%m/%Y %H:%M') }}</small></td>
+                                    <td>
+                                        <a href="{{ url_for('main.booking_details', booking_id=booking.id) }}" 
+                                           class="btn btn-sm btn-outline-primary" title="Ver Detalhes">
+                                            <i class="bi bi-eye"></i>
+                                        </a>
+                                        <button class="btn btn-sm btn-outline-success" 
+                                                onclick="changeStatus({{ booking.id }}, 'Confirmado')" 
+                                                title="Confirmar">
+                                            <i class="bi bi-check-circle"></i>
+                                        </button>
+                                        <button class="btn btn-sm btn-outline-danger" 
+                                                onclick="changeStatus({{ booking.id }}, 'Cancelado')" 
+                                                title="Cancelar">
+                                            <i class="bi bi-x-circle"></i>
+                                        </button>
+                                    </td>
+                                </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                    {% else %}
+                    <div class="alert alert-info">
+                        <i class="bi bi-info-circle"></i> Nenhuma reserva encontrada.
+                    </div>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+
+        <!-- Tab de Serviços -->
+        <div class="tab-pane fade" id="services-content" role="tabpanel" aria-labelledby="services-tab">
+            <div class="card shadow">
+                <div class="card-header bg-success text-white d-flex justify-content-between align-items-center">
+                    <h5 class="mb-0"><i class="bi bi-briefcase"></i> Gerenciar Serviços</h5>
+                    <a href="{{ url_for('main.create_service') }}" class="btn btn-light btn-sm">
+                        <i class="bi bi-plus-circle"></i> Novo Serviço
+                    </a>
+                </div>
+                <div class="card-body">
+                    {% if services %}
+                    <div class="table-responsive">
+                        <table class="table table-hover">
+                            <thead class="table-light">
+                                <tr>
+                                    <th>ID</th>
+                                    <th>Nome</th>
+                                    <th>Descrição</th>
+                                    <th>Preço</th>
+                                    <th>Ações</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for service in services %}
+                                <tr>
+                                    <td><strong>#{{ service.id }}</strong></td>
+                                    <td>{{ service.name }}</td>
+                                    <td>{{ service.description[:50] }}...</td>
+                                    <td><strong>R$ {{ "%.2f"|format(service.price) }}</strong></td>
+                                    <td>
+                                        <a href="{{ url_for('main.edit_service', service_id=service.id) }}" 
+                                           class="btn btn-sm btn-outline-warning">
+                                            <i class="bi bi-pencil"></i> Editar
+                                        </a>
+                                        <form method="POST" action="{{ url_for('main.delete_service', service_id=service.id) }}" 
+                                              style="display: inline;">
+                                            <button type="submit" class="btn btn-sm btn-outline-danger" 
+                                                    onclick="return confirm('Tem certeza que deseja excluir este serviço?')">
+                                                <i class="bi bi-trash"></i> Excluir
+                                            </button>
+                                        </form>
+                                    </td>
+                                </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                    {% else %}
+                    <div class="alert alert-info">
+                        <i class="bi bi-info-circle"></i> Nenhum serviço cadastrado.
+                    </div>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+
+        <!-- Tab de Usuários -->
+        <div class="tab-pane fade" id="users-content" role="tabpanel" aria-labelledby="users-tab">
+            <div class="card shadow">
+                <div class="card-header bg-info text-white">
+                    <h5 class="mb-0"><i class="bi bi-people"></i> Usuários do Sistema</h5>
+                </div>
+                <div class="card-body">
+                    {% if users %}
+                    <div class="table-responsive">
+                        <table class="table table-hover">
+                            <thead class="table-light">
+                                <tr>
+                                    <th>ID</th>
+                                    <th>Nome</th>
+                                    <th>Email</th>
+                                    <th>Tipo</th>
+                                    <th>Reservas</th>
+                                    <th>Cadastrado em</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for user in users %}
+                                <tr>
+                                    <td><strong>#{{ user.id }}</strong></td>
+                                    <td>
+                                        <i class="bi bi-person-circle"></i> {{ user.username }}
+                                    </td>
+                                    <td>{{ user.email }}</td>
+                                    <td>
+                                        {% if user.is_admin %}
+                                            <span class="badge bg-danger">Administrador</span>
+                                        {% else %}
+                                            <span class="badge bg-secondary">Usuário</span>
+                                        {% endif %}
+                                    </td>
+                                    <td>
+                                        <span class="badge bg-primary">{{ user.bookings|length }} reserva(s)</span>
+                                    </td>
+                                    <td><small>{{ user.created_at.strftime('%d/%m/%Y') if user.created_at else 'N/A' }}</small></td>
+                                </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                    {% else %}
+                    <div class="alert alert-info">
+                        <i class="bi bi-info-circle"></i> Nenhum usuário encontrado.
+                    </div>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+
+        <!-- Tab de Pacotes -->
+        <div class="tab-pane fade" id="packages-content" role="tabpanel" aria-labelledby="packages-tab">
+            <div class="card shadow">
+                <div class="card-header bg-warning text-dark d-flex justify-content-between align-items-center">
+                    <h5 class="mb-0"><i class="bi bi-box-seam"></i> Gerenciar Pacotes</h5>
+                    <a href="{{ url_for('main.create_package') }}" class="btn btn-dark btn-sm">
+                        <i class="bi bi-plus-circle"></i> Novo Pacote
+                    </a>
+                </div>
+                <div class="card-body">
+                    {% if packages %}
+                    <div class="table-responsive">
+                        <table class="table table-hover">
+                            <thead class="table-light">
+                                <tr>
+                                    <th>ID</th>
+                                    <th>Nome</th>
+                                    <th>Descrição</th>
+                                    <th>Preço</th>
+                                    <th>Itens</th>
+                                    <th>Ações</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for package in packages %}
+                                <tr>
+                                    <td><strong>#{{ package.id }}</strong></td>
+                                    <td>{{ package.name }}</td>
+                                    <td>{{ package.descricao[:50] if package.descricao else 'Sem descrição' }}...</td>
+                                    <td><strong>R$ {{ "%.2f"|format(package.price) }}</strong></td>
+                                    <td><span class="badge bg-info">{{ package.items|length }} serviço(s)</span></td>
+                                    <td>
+                                        <a href="{{ url_for('main.edit_package', package_id=package.id) }}" 
+                                           class="btn btn-sm btn-outline-warning">
+                                            <i class="bi bi-pencil"></i> Editar
+                                        </a>
+                                        <form method="POST" action="{{ url_for('main.delete_package', package_id=package.id) }}" 
+                                              style="display: inline;">
+                                            <button type="submit" class="btn btn-sm btn-outline-danger" 
+                                                    onclick="return confirm('Tem certeza que deseja excluir este pacote?')">
+                                                <i class="bi bi-trash"></i> Excluir
+                                            </button>
+                                        </form>
+                                    </td>
+                                </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                    {% else %}
+                    <div class="alert alert-info">
+                        <i class="bi bi-info-circle"></i> Nenhum pacote cadastrado.
+                    </div>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+
+    </div>
+</div>
+
+<script>
+// Função para alterar status da reserva
+function changeStatus(bookingId, newStatus) {
+    if (confirm(`Deseja alterar o status para "${newStatus}"?`)) {
+        fetch(`/booking/${bookingId}/update-status`, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({ status: newStatus })
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.success) {
+                alert('Status atualizado com sucesso!');
+                location.reload();
+            } else {
+                alert('Erro ao atualizar status: ' + data.message);
+            }
+        })
+        .catch(error => {
+            alert('Erro ao atualizar status: ' + error);
+        });
+    }
+}
+</script>
+{% endblock %}

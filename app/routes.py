@@ -273,12 +273,41 @@ def create_booking():
 @bp.route('/admin')
 @login_required
 def admin_dashboard():
+    """Painel administrativo completo"""
     if not current_user.is_admin:
-        flash('Acesso negado.')
+        flash('Acesso negado. Apenas administradores podem acessar esta página.', 'danger')
         return redirect(url_for('main.index'))
+    
+    # Buscar todos os dados
     services = Service.query.all()
-    bookings = Booking.query.all()
-    return render_template('admin_dashboard.html', services=services, bookings=bookings)
+    bookings = Booking.query.order_by(Booking.created_at.desc()).all()
+    users = User.query.all()
+    packages = Package.query.all()
+    
+    return render_template('admin_dashboard.html', 
+                         services=services, 
+                         bookings=bookings,
+                         users=users,
+                         packages=packages)
+
+@bp.route('/booking/<int:booking_id>/update-status', methods=['POST'])
+@login_required
+def update_booking_status(booking_id):
+    """Atualizar status de uma reserva (apenas admin)"""
+    if not current_user.is_admin:
+        return jsonify({'success': False, 'message': 'Acesso negado'}), 403
+    
+    booking = Booking.query.get_or_404(booking_id)
+    data = request.get_json()
+    new_status = data.get('status')
+    
+    if new_status not in ['Pendente', 'Confirmado', 'Cancelado', 'Aguardando Pagamento']:
+        return jsonify({'success': False, 'message': 'Status inválido'}), 400
+    
+    booking.status = new_status
+    db.session.commit()
+    
+    return jsonify({'success': True, 'message': 'Status atualizado com sucesso'})
 
 @bp.route('/book/<int:service_id>', methods=['GET', 'POST'])
 @login_required
