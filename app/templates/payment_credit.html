@@ -28,6 +28,7 @@
 
                     <!-- Formulário de Cartão -->
                     <form method="POST" action="{{ url_for('main.process_credit_payment', booking_id=booking.id) }}" id="creditCardForm">
+                        <input type="hidden" name="csrf_token" value="{{ csrf_token() }}"/>
                         <div class="row mb-3">
                             <div class="col-12">
                                 <label for="card_number" class="form-label">Número do Cartão</label>

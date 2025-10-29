@@ -2,45 +2,283 @@
 
 {% block title %}Pagamento Aprovado - Kidiversão{% endblock %}
 
+{% block extra_css %}
+<style>
+    @keyframes checkmark {
+        0% {
+            transform: scale(0) rotate(45deg);
+            opacity: 0;
+        }
+        50% {
+            transform: scale(1.2) rotate(45deg);
+            opacity: 1;
+        }
+        100% {
+            transform: scale(1) rotate(45deg);
+            opacity: 1;
+        }
+    }
+
+    @keyframes fadeIn {
+        from {
+            opacity: 0;
+            transform: translateY(20px);
+        }
+        to {
+            opacity: 1;
+            transform: translateY(0);
+        }
+    }
+
+    .success-checkmark {
+        animation: checkmark 0.8s ease-in-out;
+    }
+
+    .fade-in-content {
+        animation: fadeIn 0.6s ease-out 0.3s both;
+    }
+
+    .success-card {
+        border: none;
+        border-radius: 20px;
+        overflow: hidden;
+    }
+
+    .success-header {
+        background: linear-gradient(135deg, #28a745 0%, #20c997 100%);
+        padding: 2rem;
+    }
+
+    .confetti {
+        position: fixed;
+        width: 10px;
+        height: 10px;
+        background: #f0f;
+        position: absolute;
+        animation: confetti-fall 3s linear infinite;
+    }
+
+    @keyframes confetti-fall {
+        to {
+            transform: translateY(100vh) rotate(360deg);
+        }
+    }
+
+    .pulse {
+        animation: pulse 2s infinite;
+    }
+
+    @keyframes pulse {
+        0%, 100% {
+            transform: scale(1);
+        }
+        50% {
+            transform: scale(1.05);
+        }
+    }
+</style>
+{% endblock %}
+
 {% block content %}
 <div class="container my-5">
     <div class="row">
-        <div class="col-md-6 offset-md-3">
-            <div class="card shadow border-success">
-                <div class="card-header bg-success text-white">
-                    <h1 class="h3 mb-0">Pagamento Aprovado</h1>
+        <div class="col-lg-8 offset-lg-2">
+            <div class="card shadow-lg success-card">
+                <div class="success-header text-white text-center">
+                    <div class="success-checkmark mb-3">
+                        <i class="bi bi-check-circle-fill" style="font-size: 6rem;"></i>
+                    </div>
+                    <h1 class="display-5 fw-bold mb-2">Pagamento Aprovado!</h1>
+                    <p class="lead mb-0">Sua reserva foi confirmada com sucesso</p>
                 </div>
-                <div class="card-body text-center">
-                    <div class="mb-4">
-                        <div class="text-success mb-4">
-                            <i class="bi bi-check-circle-fill" style="font-size: 5rem;"></i>
+                
+                <div class="card-body p-4 p-md-5">
+                    <div class="fade-in-content">
+                        <!-- Detalhes da Reserva -->
+                        <div class="alert alert-success border-success mb-4">
+                            <div class="row text-center">
+                                <div class="col-md-4 mb-3 mb-md-0">
+                                    <i class="bi bi-receipt-cutoff fs-3 text-success"></i>
+                                    <p class="mb-1 small text-muted">Número da Reserva</p>
+                                    <p class="fw-bold mb-0">#{{ booking.id }}</p>
+                                </div>
+                                <div class="col-md-4 mb-3 mb-md-0">
+                                    <i class="bi bi-calendar-check fs-3 text-success"></i>
+                                    <p class="mb-1 small text-muted">Status</p>
+                                    <p class="fw-bold mb-0">{{ booking.status }}</p>
+                                </div>
+                                <div class="col-md-4">
+                                    <i class="bi bi-clock-history fs-3 text-success"></i>
+                                    <p class="mb-1 small text-muted">Data do Pagamento</p>
+                                    <p class="fw-bold mb-0">{{ booking.payment_date.strftime('%d/%m/%Y %H:%M') if booking.payment_date else 'Processando' }}</p>
+                                </div>
+                            </div>
                         </div>
-                        
-                        <h2 class="h4">Seu pagamento foi aprovado com sucesso!</h2>
-                        <p>Obrigado por escolher a Kidiversão para seu evento.</p>
-                        
-                        <div class="alert alert-success">
-                            <p class="mb-0"><strong>ID da Reserva:</strong> {{ booking.id }}</p>
-                            <p class="mb-0"><strong>Status:</strong> {{ booking.status }}</p>
-                            <p class="mb-0"><strong>Data do Pagamento:</strong> {{ booking.payment_date.strftime('%d/%m/%Y %H:%M') }}</p>
+
+                        <!-- Detalhes do Agendamento -->
+                        <div class="card bg-light mb-4">
+                            <div class="card-body">
+                                <h5 class="card-title mb-3">
+                                    <i class="bi bi-calendar-event text-primary"></i> Detalhes do Agendamento
+                                </h5>
+                                
+                                {% if booking.service %}
+                                <div class="mb-3">
+                                    <h6 class="text-primary">{{ booking.service.name }}</h6>
+                                    <p class="text-muted mb-2">{{ booking.service.description }}</p>
+                                </div>
+                                {% elif booking.package %}
+                                <div class="mb-3">
+                                    <h6 class="text-primary">{{ booking.package.name }}</h6>
+                                    <p class="text-muted mb-2">{{ booking.package.descricao if booking.package.descricao else 'Pacote personalizado com múltiplos serviços' }}</p>
+                                </div>
+                                {% endif %}
+                                
+                                <div class="row">
+                                    <div class="col-md-6">
+                                        <p class="mb-2">
+                                            <strong>Data do Evento:</strong><br>
+                                            {{ booking.event_date.strftime('%d/%m/%Y') }}
+                                        </p>
+                                        <p class="mb-2">
+                                            <strong>Status:</strong><br>
+                                            <span class="badge bg-success">{{ booking.status }}</span>
+                                        </p>
+                                    </div>
+                                    <div class="col-md-6">
+                                        <p class="mb-2">
+                                            <strong>Preço:</strong><br>
+                                            <span class="text-success fs-5 fw-bold">
+                                                {% if booking.service %}
+                                                    R$ {{ "%.2f"|format(booking.service.price) }}
+                                                {% elif booking.package %}
+                                                    R$ {{ "%.2f"|format(booking.package.total_price) }}
+                                                {% endif %}
+                                            </span>
+                                        </p>
+                                        <p class="mb-2">
+                                            <strong>Data de Criação:</strong><br>
+                                            {{ booking.created_at.strftime('%d/%m/%Y %H:%M') if booking.created_at else 'N/A' }}
+                                        </p>
+                                    </div>
+                                </div>
+                                
+                                {% if booking.payment_method %}
+                                <hr>
+                                <p class="mb-0">
+                                    <strong><i class="bi bi-credit-card"></i> Método de Pagamento:</strong> 
+                                    <span class="badge bg-info">{{ booking.payment_method|upper }}</span>
+                                </p>
+                                {% endif %}
+                            </div>
+                        </div>
+
+                        <!-- Próximos Passos -->
+                        <div class="mb-4">
+                            <h5 class="mb-3">
+                                <i class="bi bi-list-check text-primary"></i> Próximos Passos
+                            </h5>
+                            <div class="list-group">
+                                <div class="list-group-item d-flex align-items-start">
+                                    <div class="me-3 text-success">
+                                        <i class="bi bi-1-circle-fill fs-4"></i>
+                                    </div>
+                                    <div>
+                                        <h6 class="mb-1">Confirmação por E-mail</h6>
+                                        <p class="mb-0 text-muted small">Enviamos um e-mail de confirmação para você com todos os detalhes da reserva.</p>
+                                    </div>
+                                </div>
+                                <div class="list-group-item d-flex align-items-start">
+                                    <div class="me-3 text-success">
+                                        <i class="bi bi-2-circle-fill fs-4"></i>
+                                    </div>
+                                    <div>
+                                        <h6 class="mb-1">Contato da Nossa Equipe</h6>
+                                        <p class="mb-0 text-muted small">Em até 24 horas, nossa equipe entrará em contato para confirmar os detalhes do evento.</p>
+                                    </div>
+                                </div>
+                                <div class="list-group-item d-flex align-items-start">
+                                    <div class="me-3 text-success">
+                                        <i class="bi bi-3-circle-fill fs-4"></i>
+                                    </div>
+                                    <div>
+                                        <h6 class="mb-1">Preparação do Evento</h6>
+                                        <p class="mb-0 text-muted small">Nossa equipe começará os preparativos para garantir que tudo seja perfeito no dia da festa!</p>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Mensagem Especial -->
+                        <div class="alert alert-info border-0 pulse">
+                            <div class="d-flex align-items-center">
+                                <i class="bi bi-gift-fill fs-2 me-3 text-primary"></i>
+                                <div>
+                                    <h6 class="alert-heading mb-1">Obrigado por escolher a Kidiversão!</h6>
+                                    <p class="mb-0 small">Estamos ansiosos para fazer parte deste momento especial com você.</p>
+                                </div>
+                            </div>
                         </div>
                     </div>
-                    
-                    <div class="mb-4">
-                        <h3 class="h5">O que acontece agora?</h3>
-                        <ul class="list-group list-group-flush">
-                            <li class="list-group-item">Sua reserva está confirmada</li>
-                            <li class="list-group-item">Em breve, um de nossos atendentes entrará em contato para detalhes</li>
-                            <li class="list-group-item">Você pode verificar o status da sua reserva a qualquer momento na sua área de usuário</li>
-                        </ul>
-                    </div>
                 </div>
-                <div class="card-footer bg-light d-flex justify-content-between">
-                    <a href="{{ url_for('main.list_bookings') }}" class="btn btn-outline-success">Minhas Reservas</a>
-                    <a href="{{ url_for('main.index') }}" class="btn btn-primary">Página Inicial</a>
+                
+                <div class="card-footer bg-white border-0 p-4">
+                    <div class="d-grid gap-2 d-md-flex justify-content-md-between">
+                        <a href="{{ url_for('main.list_bookings') }}" class="btn btn-outline-success btn-lg">
+                            <i class="bi bi-calendar-check"></i> Minhas Reservas
+                        </a>
+                        <a href="{{ url_for('main.index') }}" class="btn btn-primary btn-lg">
+                            <i class="bi bi-house-door"></i> Voltar ao Início
+                        </a>
+                    </div>
                 </div>
             </div>
         </div>
     </div>
 </div>
+
+<script>
+// Efeito confete
+function createConfetti() {
+    const colors = ['#ff0000', '#00ff00', '#0000ff', '#ffff00', '#ff00ff', '#00ffff'];
+    for (let i = 0; i < 50; i++) {
+        setTimeout(() => {
+            const confetti = document.createElement('div');
+            confetti.style.position = 'fixed';
+            confetti.style.width = '10px';
+            confetti.style.height = '10px';
+            confetti.style.backgroundColor = colors[Math.floor(Math.random() * colors.length)];
+            confetti.style.left = Math.random() * window.innerWidth + 'px';
+            confetti.style.top = '-10px';
+            confetti.style.borderRadius = '50%';
+            confetti.style.zIndex = '9999';
+            confetti.style.pointerEvents = 'none';
+            document.body.appendChild(confetti);
+            
+            const animation = confetti.animate([
+                { transform: 'translateY(0) rotate(0deg)', opacity: 1 },
+                { transform: `translateY(${window.innerHeight + 20}px) rotate(${Math.random() * 720}deg)`, opacity: 0 }
+            ], {
+                duration: 3000 + Math.random() * 2000,
+                easing: 'cubic-bezier(0.25, 0.46, 0.45, 0.94)'
+            });
+            
+            animation.onfinish = () => confetti.remove();
+        }, i * 30);
+    }
+}
+
+// Tocar som de sucesso (opcional)
+function playSuccessSound() {
+    // Você pode adicionar um arquivo de áudio aqui se desejar
+    // const audio = new Audio('/static/sounds/success.mp3');
+    // audio.play();
+}
+
+// Executar ao carregar a página
+window.addEventListener('load', () => {
+    createConfetti();
+    // playSuccessSound();
+});
+</script>
 {% endblock %}

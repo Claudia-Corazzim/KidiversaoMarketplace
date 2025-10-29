@@ -134,6 +134,7 @@
                     </div>
 
                     <form method="POST" action="{{ url_for('main.confirm_boleto_payment', booking_id=booking.id) }}">
+                        <input type="hidden" name="csrf_token" value="{{ csrf_token() }}"/>
                         <div class="d-grid gap-2">
                             <button type="submit" class="btn btn-success btn-lg">
                                 <i class="bi bi-check-circle"></i> Confirmar que Realizei o Pagamento

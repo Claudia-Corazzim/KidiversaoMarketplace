@@ -231,6 +231,7 @@
                                         </a>
                                         <form method="POST" action="{{ url_for('main.delete_service', service_id=service.id) }}" 
                                               style="display: inline;">
+                                            <input type="hidden" name="csrf_token" value="{{ csrf_token() }}"/>
                                             <button type="submit" class="btn btn-sm btn-outline-danger" 
                                                     onclick="return confirm('Tem certeza que deseja excluir este serviço?')">
                                                 <i class="bi bi-trash"></i> Excluir
@@ -342,6 +343,7 @@
                                         </a>
                                         <form method="POST" action="{{ url_for('main.delete_package', package_id=package.id) }}" 
                                               style="display: inline;">
+                                            <input type="hidden" name="csrf_token" value="{{ csrf_token() }}"/>
                                             <button type="submit" class="btn btn-sm btn-outline-danger" 
                                                     onclick="return confirm('Tem certeza que deseja excluir este pacote?')">
                                                 <i class="bi bi-trash"></i> Excluir
