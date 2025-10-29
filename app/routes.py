@@ -635,6 +635,95 @@ def payment_pix(booking_id):
     
     return render_template('payment_pix.html', booking=booking)
 
+@bp.route('/payment/credit/<int:booking_id>', methods=['GET'])
+@login_required
+def payment_credit(booking_id):
+    """Página de pagamento via Cartão de Crédito"""
+    booking = Booking.query.get_or_404(booking_id)
+    
+    # Verificar se o booking pertence ao usuário atual
+    if booking.user_id != current_user.id and not current_user.is_admin:
+        flash('Você não tem permissão para acessar este recurso.', 'error')
+        return redirect(url_for('main.index'))
+    
+    # Atualizar o status do agendamento para aguardando pagamento
+    booking.status = 'Aguardando Pagamento'
+    booking.payment_status = 'Pendente'
+    booking.payment_method = 'Cartão de Crédito'
+    db.session.commit()
+    
+    return render_template('payment_credit.html', booking=booking)
+
+@bp.route('/payment/credit/<int:booking_id>/process', methods=['POST'])
+@login_required
+def process_credit_payment(booking_id):
+    """Processar pagamento com cartão de crédito"""
+    booking = Booking.query.get_or_404(booking_id)
+    
+    # Verificar se o booking pertence ao usuário atual
+    if booking.user_id != current_user.id and not current_user.is_admin:
+        flash('Você não tem permissão para acessar este recurso.', 'error')
+        return redirect(url_for('main.index'))
+    
+    # Simular processamento do pagamento
+    # Em produção, aqui seria integrado com gateway de pagamento real
+    card_number = request.form.get('card_number')
+    card_name = request.form.get('card_name')
+    installments = request.form.get('installments')
+    
+    # Atualizar status do pagamento
+    booking.status = 'Confirmado'
+    booking.payment_status = 'Aprovado'
+    booking.payment_method = f'Cartão de Crédito - {installments}x'
+    booking.payment_date = datetime.utcnow()
+    db.session.commit()
+    
+    flash('Pagamento processado com sucesso! Seu pedido foi confirmado.', 'success')
+    return redirect(url_for('main.payment_success', booking_id=booking.id))
+
+@bp.route('/payment/boleto/<int:booking_id>', methods=['GET'])
+@login_required
+def payment_boleto(booking_id):
+    """Página de pagamento via Boleto Bancário"""
+    booking = Booking.query.get_or_404(booking_id)
+    
+    # Verificar se o booking pertence ao usuário atual
+    if booking.user_id != current_user.id and not current_user.is_admin:
+        flash('Você não tem permissão para acessar este recurso.', 'error')
+        return redirect(url_for('main.index'))
+    
+    # Atualizar o status do agendamento para aguardando pagamento
+    booking.status = 'Aguardando Pagamento'
+    booking.payment_status = 'Pendente'
+    booking.payment_method = 'Boleto Bancário'
+    db.session.commit()
+    
+    # Importar timedelta para calcular data de vencimento
+    from datetime import timedelta
+    
+    return render_template('payment_boleto.html', booking=booking, timedelta=timedelta)
+
+@bp.route('/payment/boleto/<int:booking_id>/confirm', methods=['POST'])
+@login_required
+def confirm_boleto_payment(booking_id):
+    """Confirmar pagamento de boleto"""
+    booking = Booking.query.get_or_404(booking_id)
+    
+    # Verificar se o booking pertence ao usuário atual
+    if booking.user_id != current_user.id and not current_user.is_admin:
+        flash('Você não tem permissão para acessar este recurso.', 'error')
+        return redirect(url_for('main.index'))
+    
+    # Simular confirmação do pagamento do boleto
+    # Em produção, isso seria feito automaticamente pelo banco
+    booking.status = 'Confirmado'
+    booking.payment_status = 'Aprovado'
+    booking.payment_date = datetime.utcnow()
+    db.session.commit()
+    
+    flash('Pagamento confirmado! Seu pedido foi aprovado.', 'success')
+    return redirect(url_for('main.payment_success', booking_id=booking.id))
+
 @bp.route('/payment/success/<int:booking_id>', methods=['GET'])
 @login_required
 def payment_success(booking_id):
@@ -800,9 +889,13 @@ def checkout():
         
         db.session.commit()
         
-        # Redirecionar para a página de pagamento
+        # Redirecionar para a página de pagamento conforme método escolhido
         if payment_method == 'pix':
             return redirect(url_for('main.payment_pix', booking_id=booking.id))
+        elif payment_method == 'credit':
+            return redirect(url_for('main.payment_credit', booking_id=booking.id))
+        elif payment_method == 'boleto':
+            return redirect(url_for('main.payment_boleto', booking_id=booking.id))
         else:
             return redirect(url_for('main.payment', booking_id=booking.id))
     

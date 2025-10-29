@@ -1,0 +1,193 @@
+{% extends "base.html" %}
+
+{% block title %}Pagamento com Boleto - Kidiversão{% endblock %}
+
+{% block content %}
+<div class="container py-4">
+    <div class="row justify-content-center">
+        <div class="col-lg-8">
+            <div class="card shadow">
+                <div class="card-header bg-warning text-dark">
+                    <h4 class="mb-0"><i class="bi bi-file-earmark-bar-graph"></i> Boleto Bancário</h4>
+                </div>
+                <div class="card-body">
+                    <!-- Status do Boleto -->
+                    <div class="alert alert-success mb-4">
+                        <div class="d-flex align-items-center">
+                            <i class="bi bi-check-circle-fill fs-2 me-3"></i>
+                            <div>
+                                <h5 class="alert-heading mb-1">Boleto Gerado com Sucesso!</h5>
+                                <p class="mb-0">Seu boleto foi gerado e está pronto para pagamento.</p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Informações do Pedido -->
+                    <div class="card mb-4 border-primary">
+                        <div class="card-header bg-primary bg-opacity-10">
+                            <strong><i class="bi bi-receipt"></i> Dados do Pedido</strong>
+                        </div>
+                        <div class="card-body">
+                            <div class="row">
+                                <div class="col-md-6">
+                                    <p class="mb-2"><strong>Reserva:</strong> #{{ booking.id }}</p>
+                                    {% if booking.service %}
+                                    <p class="mb-2"><strong>Serviço:</strong> {{ booking.service.name }}</p>
+                                    {% elif booking.package %}
+                                    <p class="mb-2"><strong>Pacote:</strong> {{ booking.package.name }}</p>
+                                    {% endif %}
+                                </div>
+                                <div class="col-md-6">
+                                    <p class="mb-2"><strong>Data do Evento:</strong> {{ booking.event_date.strftime('%d/%m/%Y') }}</p>
+                                    {% if booking.service %}
+                                    <p class="mb-2"><strong>Valor:</strong> <span class="fs-5 fw-bold text-primary">R$ {{ booking.service.price|format_price_br }}</span></p>
+                                    {% elif booking.package %}
+                                    <p class="mb-2"><strong>Valor:</strong> <span class="fs-5 fw-bold text-primary">R$ {{ booking.package.total_price|format_price_br }}</span></p>
+                                    {% endif %}
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Dados do Boleto -->
+                    <div class="card mb-4 border-warning">
+                        <div class="card-header bg-warning bg-opacity-10">
+                            <strong><i class="bi bi-calendar-check"></i> Informações do Boleto</strong>
+                        </div>
+                        <div class="card-body">
+                            <div class="row mb-3">
+                                <div class="col-md-6">
+                                    <p class="mb-2"><strong>Banco:</strong> Banco do Brasil (001)</p>
+                                    <p class="mb-2"><strong>Agência:</strong> 1234-5</p>
+                                </div>
+                                <div class="col-md-6">
+                                    <p class="mb-2"><strong>Nosso Número:</strong> {{ "%010d" | format(booking.id * 12345) }}</p>
+                                    <p class="mb-2"><strong>Vencimento:</strong> {{ (booking.created_at.date() + timedelta(days=3)).strftime('%d/%m/%Y') }}</p>
+                                </div>
+                            </div>
+                            
+                            <!-- Código de Barras -->
+                            <div class="border rounded p-3 bg-light mb-3">
+                                <label class="form-label mb-2"><strong>Linha Digitável:</strong></label>
+                                <div class="input-group">
+                                    <input type="text" class="form-control form-control-lg font-monospace" 
+                                           id="barcodeNumber" readonly
+                                           value="00190.00009 01234.567890 12345.678901 2 {{ "%014d" | format((booking.service.price|float * 100)|int if booking.service else (booking.package.total_price|float * 100)|int) }}">
+                                    <button class="btn btn-outline-secondary" type="button" onclick="copyBarcode()">
+                                        <i class="bi bi-clipboard"></i> Copiar
+                                    </button>
+                                </div>
+                                <small class="text-muted">Cole este código no aplicativo do seu banco</small>
+                            </div>
+
+                            <!-- Código de Barras Visual -->
+                            <div class="text-center p-4 bg-white border rounded">
+                                <svg width="100%" height="80">
+                                    <!-- Simulação visual de código de barras -->
+                                    <g>
+                                        <rect x="10" y="0" width="3" height="80" fill="black"/>
+                                        <rect x="16" y="0" width="2" height="80" fill="black"/>
+                                        <rect x="22" y="0" width="4" height="80" fill="black"/>
+                                        <rect x="30" y="0" width="2" height="80" fill="black"/>
+                                        <rect x="36" y="0" width="6" height="80" fill="black"/>
+                                        <rect x="46" y="0" width="2" height="80" fill="black"/>
+                                        <rect x="52" y="0" width="3" height="80" fill="black"/>
+                                        <rect x="60" y="0" width="4" height="80" fill="black"/>
+                                        <rect x="68" y="0" width="2" height="80" fill="black"/>
+                                        <rect x="74" y="0" width="5" height="80" fill="black"/>
+                                        <rect x="84" y="0" width="2" height="80" fill="black"/>
+                                        <rect x="90" y="0" width="3" height="80" fill="black"/>
+                                        <rect x="98" y="0" width="4" height="80" fill="black"/>
+                                        <rect x="106" y="0" width="2" height="80" fill="black"/>
+                                        <rect x="112" y="0" width="6" height="80" fill="black"/>
+                                        <rect x="122" y="0" width="3" height="80" fill="black"/>
+                                        <rect x="130" y="0" width="2" height="80" fill="black"/>
+                                        <rect x="136" y="0" width="4" height="80" fill="black"/>
+                                        <rect x="144" y="0" width="2" height="80" fill="black"/>
+                                        <rect x="150" y="0" width="5" height="80" fill="black"/>
+                                    </g>
+                                </svg>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Instruções de Pagamento -->
+                    <div class="alert alert-info">
+                        <h6 class="alert-heading"><i class="bi bi-info-circle"></i> Como Pagar</h6>
+                        <ol class="mb-0 ps-3">
+                            <li>Copie a linha digitável acima</li>
+                            <li>Acesse o aplicativo ou internet banking do seu banco</li>
+                            <li>Selecione a opção "Pagar Boleto" ou "Código de Barras"</li>
+                            <li>Cole o código e confirme o pagamento</li>
+                            <li>O pagamento será confirmado em até 2 dias úteis</li>
+                        </ol>
+                    </div>
+
+                    <!-- Botões de Ação -->
+                    <div class="d-grid gap-2 mb-3">
+                        <button type="button" class="btn btn-primary btn-lg" onclick="window.print()">
+                            <i class="bi bi-printer"></i> Imprimir Boleto
+                        </button>
+                        <button type="button" class="btn btn-outline-primary" onclick="downloadPDF()">
+                            <i class="bi bi-file-pdf"></i> Baixar PDF
+                        </button>
+                    </div>
+
+                    <form method="POST" action="{{ url_for('main.confirm_boleto_payment', booking_id=booking.id) }}">
+                        <div class="d-grid gap-2">
+                            <button type="submit" class="btn btn-success btn-lg">
+                                <i class="bi bi-check-circle"></i> Confirmar que Realizei o Pagamento
+                            </button>
+                            <a href="{{ url_for('main.index') }}" class="btn btn-outline-secondary">
+                                <i class="bi bi-house"></i> Voltar para Início
+                            </a>
+                        </div>
+                    </form>
+
+                    <!-- Aviso Importante -->
+                    <div class="alert alert-warning mt-4 mb-0">
+                        <small>
+                            <i class="bi bi-exclamation-triangle"></i>
+                            <strong>Atenção:</strong> Após o vencimento, o boleto não poderá mais ser pago.
+                            Sua reserva será confirmada apenas após a compensação do pagamento.
+                        </small>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+function copyBarcode() {
+    const barcodeInput = document.getElementById('barcodeNumber');
+    barcodeInput.select();
+    document.execCommand('copy');
+    
+    const btn = event.target.closest('button');
+    const originalHTML = btn.innerHTML;
+    btn.innerHTML = '<i class="bi bi-check"></i> Copiado!';
+    btn.classList.remove('btn-outline-secondary');
+    btn.classList.add('btn-success');
+    
+    setTimeout(() => {
+        btn.innerHTML = originalHTML;
+        btn.classList.remove('btn-success');
+        btn.classList.add('btn-outline-secondary');
+    }, 2000);
+}
+
+function downloadPDF() {
+    alert('Funcionalidade de download em desenvolvimento. Use a opção de imprimir para salvar como PDF.');
+    window.print();
+}
+</script>
+
+<style>
+@media print {
+    .btn, nav, header, footer {
+        display: none !important;
+    }
+}
+</style>
+{% endblock %}
