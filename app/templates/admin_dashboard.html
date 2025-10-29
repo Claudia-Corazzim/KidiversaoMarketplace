@@ -333,7 +333,7 @@
                                     <td><strong>#{{ package.id }}</strong></td>
                                     <td>{{ package.name }}</td>
                                     <td>{{ package.descricao[:50] if package.descricao else 'Sem descrição' }}...</td>
-                                    <td><strong>R$ {{ "%.2f"|format(package.price) }}</strong></td>
+                                    <td><strong>R$ {{ "%.2f"|format(package.total_price) }}</strong></td>
                                     <td><span class="badge bg-info">{{ package.items|length }} serviço(s)</span></td>
                                     <td>
                                         <a href="{{ url_for('main.edit_package', package_id=package.id) }}" 
